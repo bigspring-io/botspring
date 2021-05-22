@@ -1,0 +1,45 @@
+{
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "eslint.validate": ["javascript", "typescript"],
+  "files.exclude": {
+    "yarn.lock": true,            // Yarn lockfile
+    "package-lock.json": true,    // npm lockfile
+    ".npmignore": true,           // npm ignore
+    // ".github": true,              // GitHub templates & Actions
+    ".gitignore": true,           // Git ignore
+    ".gitattributes": true,       // Git attributes
+    ".husky": true,               // Husky git hooks
+    ".lintstagedrc.json": true,   // lint-staged config
+    "commitlint.config.js": true, // commitlint config
+    // ".env": true,                 // Environment variables
+    // ".env.example": true,         // Environment variables template
+    "docker-compose.yml": true,   // Docker Compose config
+    "babel.config.json": true,    // Babel config
+    "tsconfig.json": true,        // TypeScript config
+    "tsconfig.paths.json": true,  // TypeScript paths
+    ".webpack": true,             // Webpack output
+    "webpack.config.js": true,    // Webpack config
+    ".serverless": true,          // Serverless output
+    "serverless.ts": true,        // Serverless config
+    ".releaserc.json": true,      // Semantic Release config
+    "jest.config.ts": true,       // Jest config
+    ".eslintrc.json": true,       // ESLint config
+    ".eslintignore": true,        // ESLint ignore
+    ".eslintcache": true,         // ESLint cache
+    ".prettierrc.json": true,     // Prettier config
+    ".prettierignore": true,      // Prettier ignore
+    ".editorconfig": true,        // EditorConfig
+    "LICENSE": true,
+  },
+  "conventionalCommits.gitmoji": false
+}

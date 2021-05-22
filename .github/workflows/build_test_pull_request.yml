@@ -1,0 +1,67 @@
+name: Build / Test
+
+on: pull_request
+
+env:
+  NPM_CACHE_KEY: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Build source
+        run: yarn build:development
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Check formatting
+        run: yarn format:check
+      - name: Check environment variables
+        run: yarn check-env
+      - name: Check types
+        run: yarn typecheck
+      - name: Lint
+        run: yarn lint
+      # - name: Run tests
+      #   run: yarn test

@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  botspring:
+    command: wait-for-it --strict --timeout=0 redis:6379 --yarn serve
+    container_name: botspring
+    depends_on:
+      - redis
+    environment:
+      SLS_DEBUG: '*'
+    image: bigspring/node:1.1.0
+    volumes:
+      - .:/home/node/botspring
+    working_dir: /home/node/botspring
+    ports:
+      - 5050:5050 # HTTP
+      - 5051:5051 # Websocket
+      - 5052:5052 # Lambda HTTP (for invoking with AWS SDK or AWS CLI)
+  redis:
+    container_name: botspring-redis
+    image: redis:alpine
+    ports:
+      - 6380:6379
+    volumes:
+      - botspring-redisdata:/data
+
+volumes:
+  botspring-redisdata:

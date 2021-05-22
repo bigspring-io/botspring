@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+
+# Build
+.webpack
+.serverless
+_warmup
+
+# Environment variables
+*.env
+
+# Cache
+.eslintcache
+
+# Logs
+*.log
+*.error
+
+# Misc
+.DS_Store

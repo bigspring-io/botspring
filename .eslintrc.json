@@ -1,0 +1,40 @@
+{
+  "root": true,
+  "env": {
+    "node": true
+  },
+  "globals": {
+    "__DEV__": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./",
+    "sourceType": "module",
+    "ecmaVersion": 2021
+  },
+  "plugins": ["@typescript-eslint", "jest"],
+  "extends": ["plugin:jest/recommended", "prettier"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "import/prefer-default-export": "off",
+    "no-console": [
+      "warn",
+      {
+        "allow": ["debug", "info", "warn", "error"]
+      }
+    ]
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"],
+        "moduleDirectory": ["node_modules", "src", "scripts"]
+      },
+      "typescript": {}
+    }
+  }
+}

@@ -1,0 +1,134 @@
+name: Build / Test / Deploy / Release
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  NPM_CACHE_KEY: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Build source
+        run: yarn build:production
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Check formatting
+        run: yarn format:check
+      - name: Check environment variables
+        run: yarn check-env
+      - name: Check types
+        run: yarn typecheck
+      - name: Lint
+        run: yarn lint
+      # - name: Run tests
+      #   run: yarn test
+
+  deploy:
+    name: Deploy
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Configure Serverless credentials
+        run: |
+          yarn serverless config credentials \
+          --provider aws \
+          --key ${{ secrets.AWS_ACCESS_KEY_ID }} \
+          --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+          --profile github
+      - name: Deploy to AWS
+        run: yarn deploy:production
+
+  release:
+    name: Release
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          check-latest: true
+      - name: Set npm cache
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: $NPM_CACHE_KEY
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-
+      - name: Install npm dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install --non-interactive --frozen-lockfile
+      - name: Semantic Release
+        run: npx semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
